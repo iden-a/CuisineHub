@@ -1,0 +1,24 @@
+ 
+.recipe-container {
+    text-align: center;
+}
+
+.recipe-card {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap to the next row */
+    justify-content: space-around; /* Evenly distribute cards */
+    text-align: center;
+}
+
+.recipe-card > div {
+    width: calc(33.33% - 20px); /* Adjust width to fit 3 cards in a row with some spacing */
+    margin: 10px; /* Add some margin between cards */
+    /* background-color: red; */
+    padding-top: 0.5%;
+    padding-bottom: 0.5%;
+}
+
+.recipe-card img {
+    margin: 0 auto;
+}
+

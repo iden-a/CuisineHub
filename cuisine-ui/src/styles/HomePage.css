@@ -1,0 +1,42 @@
+.homeInfo-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.homeInfo-container h1,
+.homeContainer p {
+  text-align: center;
+}
+
+.homeContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10%;
+}
+
+.homeImg {
+  width: 20%;
+  height: 20%;
+  background-color: red;
+}
+
+.home-btn {
+  width: 30%;
+  margin: auto;
+  margin-top: 5%;
+}
+
+@media screen and (max-width: 600px) {
+  .homeContainer {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .homeImg {
+    width: 50%;
+    height: 20%;
+    margin-top: 5%;
+  }
+}
