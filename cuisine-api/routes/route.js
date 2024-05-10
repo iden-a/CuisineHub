@@ -5,47 +5,98 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const router = express.Router();
-const api_key = process.env.REACT_APP_API_KEY;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 router.get('/search', async (req, res) => {
-    const { query } = req.query; 
+    const url = "https://api.yelp.com/v3/businesses/search";
+    const headers = {
+        Authorization: `Bearer ${API_KEY}`,
+    };
 
-    if (!query) {
-        return res.status(400).json({ error: 'Search query is required' });
-    }
+    const { location, radius, limit } = req.query;
+    const parameters = {
+        location,
+        term: 'food',
+        categories: 'african',
+        radius: parseInt(radius) * 1600,
+        limit: parseInt(limit),
+    };
 
     try {
-        const searchUrl = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${query}&number=30&ignorePantry=true&apiKey=${api_key}`;
-        const response = await axios.get(searchUrl);
-        const recipeArray = response.data.map(info => ({
-            id: info.id,
-            title: info.title,
-            imageUrl: info.image,
-            likes: info.likes
+        const response = await axios.get(url, { headers, params: parameters });
+        const results = response.data.businesses;
+
+        const restaurantResults = results.map(restaurant => ({
+            id: restaurant.id,
+            alias: restaurant.alias,
+            name: restaurant.name,
+            address: `${restaurant.location.address1}, ${restaurant.location.city}, ${restaurant.location.state} ${restaurant.location.zip_code}`,
+            phone: restaurant.display_phone || 'N/A',
+            price: restaurant.price || 'N/A',
+            category: restaurant.categories[0].title,
+            rating: `${restaurant.rating}/5.0 with ${restaurant.review_count} Reviews`,
+            image: restaurant.image_url,
+            alt: `image of ${restaurant.name} from yelp!`
         }));
-        res.json(recipeArray);
+
+        res.json(restaurantResults);
     } catch (error) {
-        console.error('Error searching for recipes:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('ERROR:', error);
+        res.status(500).json({ error: error.toString() });
     }
 });
 
-router.get('/recipe-details', async (req, res) => {
-    const { query } = req.query;
-
-    if (!query) {
-        return res.status(400).json({ error: 'recipe ID is required!' });
-    }
+router.get('/businesses/:alias', async (req, res) => {
+    const url = `https://api.yelp.com/v3/businesses/${req.params.alias}`;
+    const headers = {
+        Authorization: `Bearer ${API_KEY}`
+    };
 
     try {
-        const recipeUrl = `https://api.spoonacular.com/recipes/${query}/information?apiKey=${api_key}`;
-        const response = await axios.get(recipeUrl);
-        const recipeInfo = response.data;
-        res.json(recipeInfo);
-        console.log(recipeInfo);
+        const response = await axios.get(url, { headers });
+        const result = response.data;
+
+        const restaurantDetails = {
+            name: result.name,
+            image: result.image_url,
+            phone: result.display_phone || 'N/A',
+            photos: result.photos,
+            reviews: result.review_count,
+            url: result.url,
+            address: `${result.location.address1}, ${result.location.city}, ${result.location.state} ${result.location.zip_code}`,
+            alt: `image of ${result.name} from yelp!`,
+            transactions: result.transactions.map(transaction => transaction.capitalize() + " "),
+            categories: result.categories.map(category => category.title + " ")
+        };
+
+        res.json(restaurantDetails);
     } catch (error) {
-        console.error('Error retrieving recipe information:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: error.toString() });
+    }
+});
+
+router.get('/businesses/:alias/reviews', async (req, res) => {
+    const url = `https://api.yelp.com/v3/businesses/${req.params.alias}/reviews`;
+    const headers = {
+        Authorization: `Bearer ${API_KEY}`
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        const reviews = response.data.reviews;
+
+        const restaurantReviews = reviews.map(review => ({
+            id: review.user.id,
+            review_message: review.text,
+            rating: review.rating,
+            date: new Date(review.time_created).toLocaleString(),
+            url: review.url,
+            name: review.user.name
+        }));
+
+        res.json(restaurantReviews);
+    } catch (error) {
+        res.status(500).json({ error: error.toString() });
     }
 });
 
