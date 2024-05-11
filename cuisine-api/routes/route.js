@@ -57,8 +57,13 @@ router.get('/businesses/:alias', async (req, res) => {
         const response = await axios.get(url, { headers });
         const result = response.data;
 
+        const capitalizeFirstLetter = (string) => {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
         const restaurantDetails = {
             name: result.name,
+            alias: result.alias,
             image: result.image_url,
             phone: result.display_phone || 'N/A',
             photos: result.photos,
@@ -66,8 +71,8 @@ router.get('/businesses/:alias', async (req, res) => {
             url: result.url,
             address: `${result.location.address1}, ${result.location.city}, ${result.location.state} ${result.location.zip_code}`,
             alt: `image of ${result.name} from yelp!`,
-            transactions: result.transactions.map(transaction => transaction.capitalize() + " "),
-            categories: result.categories.map(category => category.title + " ")
+            transactions: result.transactions.map(transaction => capitalizeFirstLetter(transaction) + " "),
+            categories: result.categories.map(category => capitalizeFirstLetter(category.title) + " ")
         };
 
         res.json(restaurantDetails);
@@ -103,33 +108,5 @@ router.get('/businesses/:alias/reviews', async (req, res) => {
 
 
 
-// posting to Db
-// router.post("/create", async (req, res) => {
-//     const data = req.body;
-//     try {
-//         const docRef = await addDoc(User, data);
-//         console.log("User with ID: ", docRef.id);
-//         res.status(201).send({ msg: "User Added", id: docRef.id });
-//     } catch (error) {
-//         console.error("Error adding document: ", error);
-//         res.status(500).json({ msg: "Failed to add user" });
-//     }
-// });
-
-// router.post('/user/:userId/favorites', async (req, res) => {
-//     const userId = req.params.userId;
-//     const favoriteData = req.body;
-    
-//     try {
-//         const userDocRef = doc(User, userId);  // Get the reference to the specific user
-//         const favoritesCollectionRef = collection(userDocRef, 'Favorites');  // Reference to the Favorites subcollection
-//         const favoriteDocRef = await addDoc(favoritesCollectionRef, favoriteData);
-//         console.log("Favorite added with ID:", favoriteDocRef.id);
-//         res.status(201).json({ msg: "Favorite added", id: favoriteDocRef.id });
-//     } catch (error) {
-//         console.error("Error adding favorite: ", error);
-//         res.status(500).json({ msg: "Failed to add favorite" });
-//     }
-// });
 
 export default router;

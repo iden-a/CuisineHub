@@ -17,4 +17,8 @@ const db = getFirestore(app);
 
 const User = collection(db, "Users");
 
-export default User;
+// export default  User ;
+// export default { db, User };
+export default db;
+export { User };
+
