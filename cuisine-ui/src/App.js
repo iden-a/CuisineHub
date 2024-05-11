@@ -7,12 +7,12 @@ import Navbar from "./components/Navbar";
 import UserProfile from "./pages/UserProfile";
 import Favorites from "./pages/Favorites";
 import Loading from "./components/Loading";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAuth from "./auth";
 import SearchFood from "./pages/SearchFood";
 import Details from "./pages/Details";
 
 export default function App() {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth();
   console.log(isAuthenticated)
 
   if(isLoading){

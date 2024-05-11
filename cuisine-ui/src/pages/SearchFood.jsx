@@ -102,21 +102,6 @@ export default function SearchFood() {
               />
             </label>
           </div>
-
-          {/* <div className="location flex justify-center">
-            <label>
-              Category:
-              <input
-                className="rounded-lg w-96 border-2 border-slate-500 ml-2 p-1 mt-4"
-                type="text"
-                name="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="  Enter Specialty..."
-              />
-            </label>
-          </div> */}
-
         
           <div className="radius-limit flex justify-center space-x-4 mt-5 mb-5">
             <div className="radius ">
