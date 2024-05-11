@@ -35,7 +35,7 @@ export default function Navbar() {
                 <div className="absolute top-0 bg-white shadow-md rounded-md mt-14 mr-4 p-2">
                   <ul>
                     <Link to='/'>
-                    <li className="cursor-pointer mt-5" > Search Recipes </li>
+                    <li className="cursor-pointer mt-5" > Search  </li>
                     </Link>
                     <Link to='favorite-recipes'>
                     <li className="cursor-pointer mt-5" > Favorites </li>

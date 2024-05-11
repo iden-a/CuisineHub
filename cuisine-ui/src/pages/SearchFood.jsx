@@ -4,7 +4,6 @@ import Details from "./Details";
 
 export default function SearchFood() {
   const [location, setLocation] = useState("");
-//   const [category, setCategory] = useState("");
   const [radius, setRadius] = useState(0);
   const [limit, setLimit] = useState(0);
   const [results, setResults] = useState([]);
@@ -63,7 +62,6 @@ export default function SearchFood() {
   const clearSearch = async (e) => {
     e.preventDefault();
     setLocation("");
-    // setCategory("");
     setRadius(0);
     setLimit(0);
     setShowResults(false);

@@ -12,8 +12,9 @@ import SearchFood from "./pages/SearchFood";
 import Details from "./pages/Details";
 
 export default function App() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   console.log(isAuthenticated)
+  // console.log("ID ", user.id)
 
   if(isLoading){
     return(
