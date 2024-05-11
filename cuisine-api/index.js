@@ -5,7 +5,6 @@ import routes from './routes/route.js';
 import User from './config.js';
 import { doc, collection, addDoc } from 'firebase/firestore';
 
-
 dotenv.config();
 
 const app = express();
@@ -21,7 +20,7 @@ app.post("/create", async (req, res) => {
     const data = req.body;
     try {
         const docRef = await addDoc(User, data);
-        console.log("Document written with ID: ", docRef.id);
+        console.log("User with ID: ", docRef.id);
         res.status(201).send({ msg: "User Added", id: docRef.id });
     } catch (error) {
         console.error("Error adding document: ", error);
@@ -44,6 +43,7 @@ app.post('/user/:userId/favorites', async (req, res) => {
         res.status(500).json({ msg: "Failed to add favorite" });
     }
 });
+
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));
 
