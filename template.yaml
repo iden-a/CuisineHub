@@ -2,6 +2,16 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   SAM Template for React app hosted with S3 and CloudFront
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
+        
 Resources:
   WebAppS3Bucket:
     Type: AWS::S3::Bucket
@@ -12,6 +22,21 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+
+  ExpressAPIFunction: #
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: express-api/
+      Handler: app.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Events:
+        APIRouting: #ExpressAPI
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /{proxy+}
+            Method: get
 
   # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
   WebAppS3BucketPolicy:
@@ -77,3 +102,13 @@ Outputs:
     Value: !GetAtt CloudFrontDistribution.Id
   WebAppS3BucketName:
     Value: !Ref WebAppS3Bucket
+
+  ExpressAPIFunction:
+    Description: API Gateway endpoint URL for Prod stage for API function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}/"
+  APIRouting:
+    Description: Hello World Lambda Function ARN
+    Value: !GetAtt ExpressAPIFunction.Arn
+  APIRoutingIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value: !GetAtt ExpressAPIFunction.Arn
