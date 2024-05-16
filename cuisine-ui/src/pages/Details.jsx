@@ -14,7 +14,7 @@ export default function Details() {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await fetch(`/api/businesses/${alias}`);
+        const response = await fetch(`https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/api/businesses/${alias}`);
         const data = await response.json();
         console.log(data);
         setIsLoading(true);

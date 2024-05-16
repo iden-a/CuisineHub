@@ -10,7 +10,7 @@ const useAuth = () => {
     const sendUserDataToBackend = async (userData) => {
       try {
         const accessToken = await getAccessTokenSilently();
-        const response = await fetch('/create', {
+        const response = await fetch('https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -19,6 +19,8 @@ const useAuth = () => {
           body: JSON.stringify(userData),
         });
         const responseData = await response.json(); // Parse response data
+        console.log("Response Data: ", responseData)
+        console.log("Access Token: ", accessToken)
         if (!response.ok) {
           if (response.status === 400 && responseData.id) {
             // If user already exists, set userId with existing ID

@@ -11,7 +11,7 @@ export default function Reviews() {
   useEffect(() => {
       const fetchReviews = async () => {
         try {
-          const response = await fetch(`/api/businesses/${alias}/reviews`);
+          const response = await fetch(`https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/api/businesses/${alias}/reviews`);
           const data = await response.json();
           console.log(data);
           setReviews(data); // Update reviews

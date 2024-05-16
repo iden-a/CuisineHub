@@ -23,7 +23,7 @@ export default function SearchFood() {
     setShowResults(false);
     try {
       const response = await fetch(
-        `/api/search?location=${location}&radius=${radius}&limit=${limit}`
+        `https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/api/search?location=${location}&radius=${radius}&limit=${limit}`
       );
       const data = await response.json();
       console.log(data);

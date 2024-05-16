@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../auth';
-// import { Link, useHistory } from 'react-router-dom';
 
 export default function Favorites() {
     const { userId } = useAuth();
@@ -11,43 +10,17 @@ export default function Favorites() {
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
-                const response = await fetch(`/user/${userId}/favorites`);
+                const response = await fetch(`https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/user/${userId}/favorites`);
                 const data = await response.json();
                 setFavorites(data.userFavorites); // Assuming the response structure has a key 'userFavorites' containing an array of favorites
                 setIsLoading(false);
             } catch (error) {
-                console.error(error);
+                console.error(error); 
                 setIsLoading(false);
             }
         };
         fetchFavorites();
     }, [userId]);
-
-    // useEffect(() => {
-    //     const fetchFavorites = async () => {
-    //         try {
-    //             const response = await fetch(`/user/${userId}/favorites`);
-    //             const data = await response.json();
-    //             if (!response.ok) {
-    //                 // If the response status is not ok (i.e., 500), set the error message accordingly
-    //                 if (response.status === 500) {
-    //                     setError("Already Exists");
-    //                 } else {
-    //                     setError("Failed to fetch favorites");
-    //                 }
-    //                 setIsLoading(false);
-    //                 return;
-    //             }
-    //             setFavorites(data.userFavorites); // Assuming the response structure has a key 'userFavorites' containing an array of favorites
-    //             setIsLoading(false);
-    //         } catch (error) {
-    //             console.error(error);
-    //             setError("Failed to fetch favorites");
-    //             setIsLoading(false);
-    //         }
-    //     };
-    //     fetchFavorites();
-    // }, [userId]);
 
     const navigateToDetails = (alias) => {
         window.location.href = `/details/${alias}`;
