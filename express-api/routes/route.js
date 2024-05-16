@@ -12,6 +12,7 @@ router.get('/search', async (req, res) => {
     const url = "https://api.yelp.com/v3/businesses/search";
     const headers = {
         Authorization: `Bearer ${API_KEY}`,
+        'Content-Type' : 'application/json'
     };
 
     const { location, radius, limit } = req.query;
@@ -50,7 +51,8 @@ router.get('/search', async (req, res) => {
 router.get('/businesses/:alias', async (req, res) => {
     const url = `https://api.yelp.com/v3/businesses/${req.params.alias}`;
     const headers = {
-        Authorization: `Bearer ${API_KEY}`
+        Authorization: `Bearer ${API_KEY}`,
+        'Content-Type' : 'application/json'
     };
 
     try {
@@ -84,7 +86,8 @@ router.get('/businesses/:alias', async (req, res) => {
 router.get('/businesses/:alias/reviews', async (req, res) => {
     const url = `https://api.yelp.com/v3/businesses/${req.params.alias}/reviews`;
     const headers = {
-        Authorization: `Bearer ${API_KEY}`
+        Authorization: `Bearer ${API_KEY}`,
+        'Content-Type' : 'application/json'
     };
 
     try {
