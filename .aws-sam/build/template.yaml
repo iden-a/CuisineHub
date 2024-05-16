@@ -3,6 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 Description: 'SAM Template for React app hosted with S3 and CloudFront
 
   '
+Globals:
+  Function:
+    Timeout: 30
+    LoggingConfig:
+      LogFormat: JSON
 Resources:
   WebAppS3Bucket:
     Type: AWS::S3::Bucket
@@ -27,7 +32,7 @@ Resources:
           Type: Api
           Properties:
             Path: /{proxy+}
-            Method: get
+            Method: ANY
     Metadata:
       SamResourceId: ExpressAPIFunction
   WebAppS3BucketPolicy:

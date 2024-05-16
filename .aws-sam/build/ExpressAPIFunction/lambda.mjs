@@ -15,10 +15,13 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api', routes);
-
-// app.get('/api', (req, res) => {
-//     res.status(200).send(`Hello World`);
+// app.use((req, res, next) => {
+//     res.append('Access-Control-Allow-Origin', ['*']);
+//     res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+//     res.append('Access-Control-Allow-Headers', 'Content-Type');
+//     next();
 // });
+// app.options('/create', cors());
 
 app.post('/create', async (req, res) => {
     const data = req.body;
@@ -70,7 +73,7 @@ app.get('/user/:userId/favorites', async (req, res) => {
         const userFavoritesQuerySnapshot = await getDocs(collection(db, 'Users', userId, 'Favorites'));
         // Initialize an array to store the retrieved favorites
         const userFavorites = [];
-        // Iterate over the query snapshot to extract favorite data
+        // Iterate over the query to extract the data
         userFavoritesQuerySnapshot.forEach((doc) => {
             // Extract data from each document and push it to the 'userFavorites' array
             userFavorites.push({ id: doc.id, ...doc.data() });
