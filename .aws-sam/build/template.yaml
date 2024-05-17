@@ -19,6 +19,14 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+  ExpressAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: '''GET,POST,OPTIONS'''
+        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+        AllowOrigin: '''*'''
   ExpressAPIFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -31,6 +39,8 @@ Resources:
         APIRouting:
           Type: Api
           Properties:
+            RestApiId:
+              Ref: ExpressAPI
             Path: /{proxy+}
             Method: ANY
     Metadata:
@@ -64,6 +74,12 @@ Resources:
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment:
+          Fn::Sub: ${AWS::StackName}-OAI
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -75,12 +91,10 @@ Resources:
             - RegionalDomainName
           Id:
             Fn::Sub: ${AWS::StackName}-web-app-s3-origin
-          OriginAccessControlId:
-            Fn::GetAtt:
-            - WebAppOriginAccessControl
-            - Id
-          S3OriginConfig: {}
-        Enabled: 'true'
+          S3OriginConfig:
+            OriginAccessIdentity:
+              Fn::Sub: origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
+        Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
           AllowedMethods:
@@ -89,9 +103,11 @@ Resources:
           - OPTIONS
           TargetOriginId:
             Fn::Sub: ${AWS::StackName}-web-app-s3-origin
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
-          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf
           ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
         PriceClass: PriceClass_All
         CustomErrorResponses:
         - ErrorCode: 404
@@ -117,7 +133,7 @@ Outputs:
   ExpressAPIFunction:
     Description: API Gateway endpoint URL for Prod stage for API function
     Value:
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}/
+      Fn::Sub: https://${ExpressAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}/
   APIRouting:
     Description: Hello World Lambda Function ARN
     Value:

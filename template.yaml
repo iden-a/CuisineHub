@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   SAM Template for React app hosted with S3 and CloudFront
-
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -11,7 +10,6 @@ Globals:
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
-
         
 Resources:
   WebAppS3Bucket:
@@ -24,8 +22,17 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  ExpressAPIFunction: #
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  ExpressAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  ExpressAPIFunction:
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: express-api/
       Handler: app.lambdaHandler
@@ -33,12 +40,12 @@ Resources:
       Architectures:
       - x86_64
       Events:
-        APIRouting: #ExpressAPI
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        APIRouting:
+          Type: Api
           Properties:
+            RestApiId: !Ref ExpressAPI
             Path: /{proxy+}
             Method: ANY
-        
 
   # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
   WebAppS3BucketPolicy:
@@ -58,7 +65,7 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
-
+                
   WebAppOriginAccessControl:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
@@ -68,6 +75,13 @@ Resources:
         SigningBehavior: always
         SigningProtocol: sigv4
 
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "${AWS::StackName}-OAI"
+
+
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -75,9 +89,9 @@ Resources:
         Origins:
           - DomainName: !GetAtt WebAppS3Bucket.RegionalDomainName
             Id: !Sub "${AWS::StackName}-web-app-s3-origin"
-            OriginAccessControlId: !GetAtt WebAppOriginAccessControl.Id
-            S3OriginConfig: {}
-        Enabled: "true"
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
+        Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
           AllowedMethods:
@@ -85,9 +99,11 @@ Resources:
             - HEAD
             - OPTIONS
           TargetOriginId: !Sub "${AWS::StackName}-web-app-s3-origin"
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
-          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # CORS-S3Origin
           ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
         PriceClass: PriceClass_All
         CustomErrorResponses:
           - ErrorCode: 404
@@ -104,10 +120,9 @@ Outputs:
     Value: !GetAtt CloudFrontDistribution.Id
   WebAppS3BucketName:
     Value: !Ref WebAppS3Bucket
-
   ExpressAPIFunction:
     Description: API Gateway endpoint URL for Prod stage for API function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}/"
+    Value: !Sub "https://${ExpressAPI}.execute-api.${AWS::Region}.amazonaws.com/Prod/{proxy+}/"
   APIRouting:
     Description: Hello World Lambda Function ARN
     Value: !GetAtt ExpressAPIFunction.Arn
