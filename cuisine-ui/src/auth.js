@@ -10,7 +10,7 @@ const useAuth = () => {
     const sendUserDataToBackend = async (userData) => {
       try {
         const accessToken = await getAccessTokenSilently();
-        const response = await fetch('https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/create', {
+        const response = await fetch('https://b658votv24.execute-api.us-east-1.amazonaws.com/Prod/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

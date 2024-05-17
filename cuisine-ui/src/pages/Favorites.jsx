@@ -10,7 +10,7 @@ export default function Favorites() {
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
-                const response = await fetch(`https://6xrrjp4jg3.execute-api.us-east-1.amazonaws.com/Prod/user/${userId}/favorites`);
+                const response = await fetch(`https://b658votv24.execute-api.us-east-1.amazonaws.com/Prod/user/${userId}/favorites`);
                 const data = await response.json();
                 setFavorites(data.userFavorites); // Assuming the response structure has a key 'userFavorites' containing an array of favorites
                 setIsLoading(false);
@@ -52,10 +52,8 @@ export default function Favorites() {
                             </div>
                             <div className="p-5">
                               <p> Phone: {favorite.phone}</p>
-                              <p> Address: {favorite.address}</p>
-                              <p> ID: {favorite.id} </p>
-                              <p> ID: {favorite.alias} </p>
-                              <button onClick={() => navigateToDetails(favorite.alias)}> VIEW DETAILS</button>
+                              <p> Price Range: {favorite.price}</p>
+                              <button onClick={() => navigateToDetails(favorite.alias)} className='underline hover:text-amber-500'> Details </button>
                             </div>                               
 
                           </div>
